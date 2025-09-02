@@ -256,15 +256,9 @@
         <button class="submit-btn" id="submitBtn" onclick="submitWriting()">Submit Writing</button>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script>
-        // EmailJS Configuration - Replace these with your actual values
-        const EMAILJS_SERVICE_ID = 'service_l4zctd8';
-        const EMAILJS_TEMPLATE_ID = 'template_qb2tjpz';
-        const EMAILJS_PUBLIC_KEY = '1DAm6gd8jhWc0i2n4';
-        
-        // Initialize EmailJS
-        emailjs.init(EMAILJS_PUBLIC_KEY);
+        // Configuration - Add your email here
+        const TEACHER_EMAIL = 'thinhhooper2412@gmail.com'; // ← Replace with your actual email
         
         let timer = null;
         let totalSeconds = 3600; // 60 minutes default
@@ -362,41 +356,32 @@
             const secondsUsed = timeUsed % 60;
             const timeUsedFormatted = `${minutesUsed}:${secondsUsed.toString().padStart(2, '0')}`;
             
-            // Disable submit button and show loading
-            const submitBtn = document.getElementById('submitBtn');
-            const originalText = submitBtn.textContent;
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Submitting...';
+            // Create email body
+            const emailBody = `Student Name: ${studentName}
+Word Count: ${words} words
+Time Used: ${timeUsedFormatted}
+Submission Date: ${new Date().toLocaleString()}
+
+Writing Content:
+${writingText}`;
             
-            // Prepare email data
-            const templateParams = {
-                student_name: studentName,
-                writing_content: writingText,
-                word_count: words,
-                time_used: timeUsedFormatted,
-                submission_date: new Date().toLocaleString()
-            };
+            // Create mailto link
+            const subject = `IELTS Writing Submission - ${studentName}`;
+            const mailtoLink = `mailto:${TEACHER_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
             
-            // Send email using EmailJS
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
-                .then(function(response) {
-                    alert(`Writing submitted successfully!\n\nStudent: ${studentName}\nWord count: ${words}\nTime used: ${timeUsedFormatted}\n\nYour submission has been sent to the teacher.`);
-                    
-                    // Reset everything
-                    document.getElementById('writingBox').value = '';
-                    document.getElementById('studentName').value = '';
-                    updateWordCount();
-                    resetTimer();
-                })
-                .catch(function(error) {
-                    console.error('EmailJS Error:', error);
-                    alert('Error sending submission. Please try again or contact your teacher.');
-                })
-                .finally(function() {
-                    // Re-enable submit button
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = originalText;
-                });
+            // Open email client
+            window.open(mailtoLink);
+            
+            // Show success message
+            alert(`Submission prepared for ${studentName}!\n\nWord count: ${words}\nTime used: ${timeUsedFormatted}\n\nYour email client should open to send the submission.`);
+            
+            // Reset everything after a delay
+            setTimeout(() => {
+                document.getElementById('writingBox').value = '';
+                document.getElementById('studentName').value = '';
+                updateWordCount();
+                resetTimer();
+            }, 2000);
         }
 
         // Initialize
