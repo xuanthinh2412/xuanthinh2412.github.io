@@ -137,6 +137,59 @@
             text-align: center;
         }
 
+        .task-section {
+            margin-bottom: 25px;
+        }
+
+        .task-section label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: #555;
+            font-size: 1.1em;
+        }
+
+        .task-box {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid #f39c12;
+            border-radius: 8px;
+            font-size: 15px;
+            line-height: 1.5;
+            background: #fef9e7;
+            resize: vertical;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .task-box:focus {
+            outline: none;
+            border-color: #e67e22;
+            background: #fdf2e9;
+        }
+
+        .task-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            justify-content: flex-end;
+        }
+
+        .task-btn {
+            background: #f39c12;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.3s ease;
+        }
+
+        .task-btn:hover {
+            background: #e67e22;
+        }
+
         .writing-area {
             margin-bottom: 25px;
         }
@@ -247,6 +300,15 @@
             </div>
         </div>
 
+        <div class="task-section">
+            <label for="taskBox">Writing Task:</label>
+            <textarea id="taskBox" class="task-box" placeholder="Enter the IELTS writing task/prompt here for students to see..."></textarea>
+            <div class="task-controls">
+                <button class="task-btn" onclick="saveTask()">Save Task</button>
+                <button class="task-btn" onclick="clearTask()">Clear Task</button>
+            </div>
+        </div>
+
         <div class="writing-area">
             <label for="writingBox">Your Writing:</label>
             <textarea id="writingBox" class="writing-box" placeholder="Start writing your IELTS essay here..."></textarea>
@@ -258,7 +320,7 @@
 
     <script>
         // Configuration - Add your email here
-        const TEACHER_EMAIL = 'thinhhooper2412@gmail.com'; // ← Replace with your actual email
+        const TEACHER_EMAIL = 'your-email@gmail.com'; // ← Replace with your actual email
         
         let timer = null;
         let totalSeconds = 3600; // 60 minutes default
@@ -336,6 +398,30 @@
             document.getElementById('wordCount').textContent = `Word count: ${words}`;
         }
 
+        function saveTask() {
+            const taskContent = document.getElementById('taskBox').value.trim();
+            if (taskContent) {
+                // Store task in browser memory for this session
+                sessionStorage.setItem('ieltsTask', taskContent);
+                alert('Task saved! Students will see this writing prompt.');
+            } else {
+                alert('Please enter a task first.');
+            }
+        }
+
+        function clearTask() {
+            document.getElementById('taskBox').value = '';
+            sessionStorage.removeItem('ieltsTask');
+            alert('Task cleared.');
+        }
+
+        function loadTask() {
+            const savedTask = sessionStorage.getItem('ieltsTask');
+            if (savedTask) {
+                document.getElementById('taskBox').value = savedTask;
+            }
+        }
+
         function submitWriting() {
             const studentName = document.getElementById('studentName').value.trim();
             const writingText = document.getElementById('writingBox').value.trim();
@@ -357,12 +443,15 @@
             const timeUsedFormatted = `${minutesUsed}:${secondsUsed.toString().padStart(2, '0')}`;
             
             // Create email body
-            const emailBody = `Student Name: ${studentName}
+            const taskContent = document.getElementById('taskBox').value.trim();
+            const emailBody = `Writing Task: ${taskContent || 'No task specified'}
+
+Student Name: ${studentName}
 Word Count: ${words} words
 Time Used: ${timeUsedFormatted}
 Submission Date: ${new Date().toLocaleString()}
 
-Writing Content:
+Student's Writing:
 ${writingText}`;
             
             // Create mailto link
@@ -394,6 +483,7 @@ ${writingText}`;
         
         updateDisplay();
         updateWordCount();
+        loadTask(); // Load any saved task
     </script>
 </body>
 </html>
