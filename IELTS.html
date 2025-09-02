@@ -137,6 +137,67 @@
             text-align: center;
         }
 
+        .current-task {
+            background: #fef9e7;
+            border: 2px solid #f39c12;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .current-task h3 {
+            color: #e67e22;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .current-task .task-content {
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            white-space: pre-line;
+        }
+
+        .current-task .task-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .no-task {
+            text-align: center;
+            color: #95a5a6;
+            font-style: italic;
+            padding: 30px;
+        }
+
+        .teacher-controls {
+            background: #f8f9fa;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .teacher-mode-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 1000;
+        }
+
+        .teacher-mode-btn:hover {
+            background: #2980b9;
+        }
+
         .task-section {
             margin-bottom: 25px;
         }
@@ -188,6 +249,74 @@
 
         .task-btn:hover {
             background: #e67e22;
+        }
+
+        .image-upload-section {
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .image-upload-section label {
+            font-size: 1em;
+            margin-bottom: 8px;
+            color: #666;
+        }
+
+        .image-upload {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .image-upload input[type=file] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .image-upload-label {
+            display: block;
+            padding: 15px;
+            border: 2px dashed #f39c12;
+            border-radius: 8px;
+            text-align: center;
+            background: #fefbf3;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .image-upload:hover .image-upload-label {
+            background: #fdf2e9;
+            border-color: #e67e22;
+        }
+
+        .image-preview {
+            margin-top: 10px;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .remove-image-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            margin-top: 5px;
+        }
+
+        .remove-image-btn:hover {
+            background: #c0392b;
         }
 
         .writing-area {
@@ -303,6 +432,18 @@
         <div class="task-section">
             <label for="taskBox">Writing Task:</label>
             <textarea id="taskBox" class="task-box" placeholder="Enter the IELTS writing task/prompt here for students to see..."></textarea>
+            
+            <div class="image-upload-section">
+                <label>Task Image (optional):</label>
+                <div class="image-upload">
+                    <input type="file" id="taskImageUpload" accept="image/*" onchange="handleImageUpload(event)">
+                    <label for="taskImageUpload" class="image-upload-label">
+                        📷 Click to upload chart/graph/image
+                    </label>
+                </div>
+                <div id="imagePreview" class="image-preview"></div>
+            </div>
+            
             <div class="task-controls">
                 <button class="task-btn" onclick="saveTask()">Save Task</button>
                 <button class="task-btn" onclick="clearTask()">Clear Task</button>
@@ -398,28 +539,141 @@
             document.getElementById('wordCount').textContent = `Word count: ${words}`;
         }
 
-        function saveTask() {
-            const taskContent = document.getElementById('taskBox').value.trim();
-            if (taskContent) {
-                // Store task in browser memory for this session
-                sessionStorage.setItem('ieltsTask', taskContent);
-                alert('Task saved! Students will see this writing prompt.');
+        // Task Management - Edit these variables to set tasks for students
+        const CURRENT_TASK = {
+            text: `Task 1: The charts below show energy consumption patterns in two different countries from 2010 to 2020.
+
+Summarize the information shown in the charts and make comparisons where relevant.
+
+Write at least 150 words.`,
+            
+            images: [
+                'chart1.png',  // Upload these images to your GitHub repository
+                'chart2.png'   // Then students will see both charts
+            ]
+            
+            // For single image, use: image: 'your-image.png'
+            // For multiple images, use: images: ['image1.png', 'image2.png']
+        };
+
+        let teacherModeVisible = true;
+        let currentTaskImage = null;
+
+        function displayCurrentTask() {
+            const taskDisplay = document.getElementById('currentTaskDisplay');
+            
+            if (CURRENT_TASK.text || CURRENT_TASK.image || CURRENT_TASK.images) {
+                let imageHtml = '';
+                
+                // Handle single image
+                if (CURRENT_TASK.image) {
+                    imageHtml = `<img src="${CURRENT_TASK.image}" alt="Task Image" class="task-image">`;
+                }
+                
+                // Handle multiple images
+                if (CURRENT_TASK.images && CURRENT_TASK.images.length > 0) {
+                    imageHtml = CURRENT_TASK.images.map((img, index) => 
+                        `<img src="${img}" alt="Task Image ${index + 1}" class="task-image" style="margin-bottom: 10px;">`
+                    ).join('');
+                }
+                
+                taskDisplay.innerHTML = `
+                    <h3>📝 Writing Task</h3>
+                    <div class="task-content">${CURRENT_TASK.text || ''}</div>
+                    ${imageHtml}
+                `;
             } else {
-                alert('Please enter a task first.');
+                taskDisplay.innerHTML = `<div class="no-task">No task set yet. Teacher needs to set a writing task.</div>`;
+            }
+        }
+
+        function setTask() {
+            const taskText = document.getElementById('taskBox').value.trim();
+            if (taskText || currentTaskImage) {
+                // Show preview of what students will see
+                const preview = `
+                    <h3>✅ Task Set Successfully!</h3>
+                    <p style="color: #27ae60; margin-bottom: 15px;"><strong>Students will now see:</strong></p>
+                    <div class="task-content">${taskText}</div>
+                    ${currentTaskImage ? `<img src="${currentTaskImage}" alt="Task Image" class="task-image">` : ''}
+                    <p style="color: #e74c3c; margin-top: 15px; font-size: 0.9em;">
+                        <strong>Note:</strong> To permanently save this task for all students, you need to update the HTML code and re-upload to GitHub.
+                    </p>
+                `;
+                
+                document.getElementById('currentTaskDisplay').innerHTML = preview;
+                alert('Task set! Students can now see this task.\n\nTo make it permanent: Update the CURRENT_TASK variable in the code and re-upload to GitHub.');
+            } else {
+                alert('Please enter a task or upload an image first.');
             }
         }
 
         function clearTask() {
             document.getElementById('taskBox').value = '';
-            sessionStorage.removeItem('ieltsTask');
-            alert('Task cleared.');
+            removeImage();
+            document.getElementById('currentTaskDisplay').innerHTML = `<div class="no-task">No task set.</div>`;
+        }
+
+        function toggleTeacherMode() {
+            const controls = document.getElementById('teacherControls');
+            const btn = document.querySelector('.teacher-mode-btn') || document.createElement('button');
+            
+            teacherModeVisible = !teacherModeVisible;
+            
+            if (teacherModeVisible) {
+                controls.style.display = 'block';
+                btn.textContent = 'Hide Teacher Controls';
+                btn.onclick = toggleTeacherMode;
+            } else {
+                controls.style.display = 'none';
+                btn.textContent = 'Show Teacher Controls';
+                btn.className = 'teacher-mode-btn';
+                btn.onclick = toggleTeacherMode;
+                if (!document.body.contains(btn)) {
+                    document.body.appendChild(btn);
+                }
+            }
+        }
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentTaskImage = e.target.result;
+                    displayImagePreview(currentTaskImage, file.name);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function displayImagePreview(imageSrc, fileName) {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = `
+                <div>
+                    <img src="${imageSrc}" alt="Task Image">
+                    <div>
+                        <small style="color: #666;">📎 ${fileName}</small>
+                        <button class="remove-image-btn" onclick="removeImage()">Remove</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function removeImage() {
+            currentTaskImage = null;
+            document.getElementById('imagePreview').innerHTML = '';
+            document.getElementById('taskImageUpload').value = '';
+        }
+
+        function saveTask() {
+            // This function is now replaced by setTask()
+            setTask();
         }
 
         function loadTask() {
-            const savedTask = sessionStorage.getItem('ieltsTask');
-            if (savedTask) {
-                document.getElementById('taskBox').value = savedTask;
-            }
+            // Load the default task
+            displayCurrentTask();
         }
 
         function submitWriting() {
@@ -443,8 +697,7 @@
             const timeUsedFormatted = `${minutesUsed}:${secondsUsed.toString().padStart(2, '0')}`;
             
             // Create email body
-            const taskContent = document.getElementById('taskBox').value.trim();
-            const emailBody = `Writing Task: ${taskContent || 'No task specified'}
+            const emailBody = `Writing Task: ${CURRENT_TASK.text || 'No task specified'}
 
 Student Name: ${studentName}
 Word Count: ${words} words
