@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Writing Practice</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.2em;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+
+        .top-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 20px;
+        }
+
+        .name-input {
+            flex: 1;
+        }
+
+        .name-input label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .name-input input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .name-input input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .timer {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 120px;
+            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
+        }
+
+        .timer-display {
+            font-size: 1.8em;
+            font-weight: bold;
+            display: block;
+        }
+
+        .timer-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+
+        .timer-btn {
+            background: #34495e;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.3s ease;
+        }
+
+        .timer-btn:hover {
+            background: #2c3e50;
+        }
+
+        .timer-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .timer-input input {
+            width: 60px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .writing-area {
+            margin-bottom: 25px;
+        }
+
+        .writing-area label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: #555;
+            font-size: 1.1em;
+        }
+
+        .writing-box {
+            width: 100%;
+            min-height: 400px;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            line-height: 1.6;
+            font-family: 'Georgia', serif;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .writing-box:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .word-count {
+            text-align: right;
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .submit-btn {
+            background: #27ae60;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            width: 100%;
+        }
+
+        .submit-btn:hover {
+            background: #229954;
+        }
+
+        .submit-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        .expired {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d) !important;
+        }
+
+        @media (max-width: 600px) {
+            .top-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .timer {
+                align-self: center;
+            }
+            
+            .container {
+                margin: 10px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>IELTS Writing Practice</h1>
+            <p>Practice your writing skills with a timer</p>
+        </div>
+
+        <div class="top-section">
+            <div class="name-input">
+                <label for="studentName">Student Name:</label>
+                <input type="text" id="studentName" placeholder="Enter your name">
+            </div>
+
+            <div class="timer" id="timerDisplay">
+                <span class="timer-display" id="timeDisplay">60:00</span>
+                <span class="timer-label">Minutes</span>
+                
+                <div class="timer-input">
+                    <input type="number" id="minutesInput" value="60" min="1" max="180">
+                    <label>min</label>
+                </div>
+                
+                <div class="timer-controls">
+                    <button class="timer-btn" id="startBtn" onclick="startTimer()">Start</button>
+                    <button class="timer-btn" id="pauseBtn" onclick="pauseTimer()" disabled>Pause</button>
+                    <button class="timer-btn" id="resetBtn" onclick="resetTimer()">Reset</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="writing-area">
+            <label for="writingBox">Your Writing:</label>
+            <textarea id="writingBox" class="writing-box" placeholder="Start writing your IELTS essay here..."></textarea>
+            <div class="word-count" id="wordCount">Word count: 0</div>
+        </div>
+
+        <button class="submit-btn" id="submitBtn" onclick="submitWriting()">Submit Writing</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script>
+        // EmailJS Configuration - Replace these with your actual values
+        const EMAILJS_SERVICE_ID = service_l4zctd8;
+        const EMAILJS_TEMPLATE_ID = template_qb2tjpz;
+        const EMAILJS_PUBLIC_KEY = 1DAm6gd8jhWc0i2n4;
+        
+        // Initialize EmailJS
+        emailjs.init(EMAILJS_PUBLIC_KEY);
+        
+        let timer = null;
+        let totalSeconds = 3600; // 60 minutes default
+        let remainingSeconds = totalSeconds;
+        let isRunning = false;
+
+        function updateDisplay() {
+            const minutes = Math.floor(remainingSeconds / 60);
+            const seconds = remainingSeconds % 60;
+            document.getElementById('timeDisplay').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function startTimer() {
+            if (!isRunning) {
+                const minutesInput = document.getElementById('minutesInput');
+                if (!isRunning && remainingSeconds === totalSeconds) {
+                    totalSeconds = parseInt(minutesInput.value) * 60;
+                    remainingSeconds = totalSeconds;
+                }
+                
+                isRunning = true;
+                document.getElementById('startBtn').disabled = true;
+                document.getElementById('pauseBtn').disabled = false;
+                document.getElementById('minutesInput').disabled = true;
+                
+                timer = setInterval(() => {
+                    remainingSeconds--;
+                    updateDisplay();
+                    
+                    if (remainingSeconds <= 0) {
+                        timeUp();
+                    }
+                }, 1000);
+            }
+        }
+
+        function pauseTimer() {
+            if (isRunning) {
+                clearInterval(timer);
+                isRunning = false;
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('pauseBtn').disabled = true;
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timer);
+            isRunning = false;
+            const minutesInput = document.getElementById('minutesInput');
+            totalSeconds = parseInt(minutesInput.value) * 60;
+            remainingSeconds = totalSeconds;
+            
+            updateDisplay();
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('pauseBtn').disabled = true;
+            document.getElementById('minutesInput').disabled = false;
+            document.getElementById('timerDisplay').classList.remove('expired');
+            document.getElementById('submitBtn').disabled = false;
+        }
+
+        function timeUp() {
+            clearInterval(timer);
+            isRunning = false;
+            document.getElementById('timerDisplay').classList.add('expired');
+            document.getElementById('timeDisplay').textContent = '00:00';
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('pauseBtn').disabled = true;
+            alert('Time\'s up! Please submit your writing.');
+        }
+
+        function updateWordCount() {
+            const text = document.getElementById('writingBox').value;
+            const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+            document.getElementById('wordCount').textContent = `Word count: ${words}`;
+        }
+
+        function submitWriting() {
+            const studentName = document.getElementById('studentName').value.trim();
+            const writingText = document.getElementById('writingBox').value.trim();
+            
+            if (!studentName) {
+                alert('Please enter your name.');
+                return;
+            }
+            
+            if (!writingText) {
+                alert('Please write something before submitting.');
+                return;
+            }
+            
+            const words = writingText.split(/\s+/).length;
+            const timeUsed = totalSeconds - remainingSeconds;
+            const minutesUsed = Math.floor(timeUsed / 60);
+            const secondsUsed = timeUsed % 60;
+            const timeUsedFormatted = `${minutesUsed}:${secondsUsed.toString().padStart(2, '0')}`;
+            
+            // Disable submit button and show loading
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+            
+            // Prepare email data
+            const templateParams = {
+                student_name: studentName,
+                writing_content: writingText,
+                word_count: words,
+                time_used: timeUsedFormatted,
+                submission_date: new Date().toLocaleString()
+            };
+            
+            // Send email using EmailJS
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
+                .then(function(response) {
+                    alert(`Writing submitted successfully!\n\nStudent: ${studentName}\nWord count: ${words}\nTime used: ${timeUsedFormatted}\n\nYour submission has been sent to the teacher.`);
+                    
+                    // Reset everything
+                    document.getElementById('writingBox').value = '';
+                    document.getElementById('studentName').value = '';
+                    updateWordCount();
+                    resetTimer();
+                })
+                .catch(function(error) {
+                    console.error('EmailJS Error:', error);
+                    alert('Error sending submission. Please try again or contact your teacher.');
+                })
+                .finally(function() {
+                    // Re-enable submit button
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                });
+        }
+
+        // Initialize
+        document.getElementById('writingBox').addEventListener('input', updateWordCount);
+        document.getElementById('minutesInput').addEventListener('change', function() {
+            if (!isRunning) {
+                resetTimer();
+            }
+        });
+        
+        updateDisplay();
+        updateWordCount();
+    </script>
+</body>
+</html>
