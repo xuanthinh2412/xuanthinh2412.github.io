@@ -1,756 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IELTS Writing Practice</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            background: #f5f7fa;
-            min-height: 100vh;
-            padding: 20px;
-            color: #333;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #e9ecef;
-        }
-
-        .header h1 {
-            color: #2c3e50;
-            font-size: 2.2em;
-            margin-bottom: 5px;
-        }
-
-        .header p {
-            color: #7f8c8d;
-            font-size: 1.1em;
-        }
-
-        .top-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            gap: 20px;
-        }
-
-        .name-input {
-            flex: 1;
-        }
-
-        .name-input label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #555;
-        }
-
-        .name-input input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
-        }
-
-        .name-input input:focus {
-            outline: none;
-            border-color: #3498db;
-        }
-
-        .timer {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            color: white;
-            padding: 15px 20px;
-            border-radius: 10px;
-            text-align: center;
-            min-width: 120px;
-            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
-        }
-
-        .timer-display {
-            font-size: 1.8em;
-            font-weight: bold;
-            display: block;
-        }
-
-        .timer-label {
-            font-size: 0.9em;
-            opacity: 0.9;
-        }
-
-        .timer-controls {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            justify-content: center;
-        }
-
-        .timer-btn {
-            background: #34495e;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: background 0.3s ease;
-        }
-
-        .timer-btn:hover {
-            background: #2c3e50;
-        }
-
-        .timer-input {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .timer-input input {
-            width: 60px;
-            padding: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            text-align: center;
-        }
-
-        .current-task {
-            background: #fef9e7;
-            border: 2px solid #f39c12;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .current-task h3 {
-            color: #e67e22;
-            margin-bottom: 15px;
-            font-size: 1.2em;
-        }
-
-        .current-task .task-content {
-            font-size: 15px;
-            line-height: 1.6;
-            margin-bottom: 15px;
-            white-space: pre-line;
-        }
-
-        .current-task .task-image {
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .no-task {
-            text-align: center;
-            color: #95a5a6;
-            font-style: italic;
-            padding: 30px;
-        }
-
-        .show-controls-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.9em;
-            z-index: 1000;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-
-        .show-controls-btn:hover {
-            background: #c0392b;
-        }
-
-        .teacher-controls {
-            background: #f8f9fa;
-            border: 2px dashed #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .teacher-mode-btn {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9em;
-            position: absolute;
-            top: 20px;
-            right: 20px;
-        }
-
-        .teacher-mode-btn:hover {
-            background: #2980b9;
-        }
-
-        .task-section {
-            margin-bottom: 25px;
-        }
-
-        .task-section label {
-            display: block;
-            margin-bottom: 12px;
-            font-weight: 600;
-            color: #555;
-            font-size: 1.1em;
-        }
-
-        .task-box {
-            width: 100%;
-            min-height: 120px;
-            padding: 15px;
-            border: 2px solid #f39c12;
-            border-radius: 8px;
-            font-size: 15px;
-            line-height: 1.5;
-            background: #fef9e7;
-            resize: vertical;
-            font-family: 'Arial', sans-serif;
-        }
-
-        .task-box:focus {
-            outline: none;
-            border-color: #e67e22;
-            background: #fdf2e9;
-        }
-
-        .task-controls {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-            justify-content: flex-end;
-        }
-
-        .task-btn {
-            background: #f39c12;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: background 0.3s ease;
-        }
-
-        .task-btn:hover {
-            background: #e67e22;
-        }
-
-        .image-upload-section {
-            margin-top: 15px;
-            margin-bottom: 15px;
-        }
-
-        .image-upload-section label {
-            font-size: 1em;
-            margin-bottom: 8px;
-            color: #666;
-        }
-
-        .image-upload {
-            position: relative;
-            display: inline-block;
-            cursor: pointer;
-            width: 100%;
-        }
-
-        .image-upload input[type=file] {
-            position: absolute;
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-        }
-
-        .image-upload-label {
-            display: block;
-            padding: 15px;
-            border: 2px dashed #f39c12;
-            border-radius: 8px;
-            text-align: center;
-            background: #fefbf3;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .image-upload:hover .image-upload-label {
-            background: #fdf2e9;
-            border-color: #e67e22;
-        }
-
-        .image-preview {
-            margin-top: 10px;
-        }
-
-        .image-preview img {
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .remove-image-btn {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8em;
-            margin-top: 5px;
-        }
-
-        .remove-image-btn:hover {
-            background: #c0392b;
-        }
-
-        .writing-area {
-            margin-bottom: 25px;
-        }
-
-        .writing-area label {
-            display: block;
-            margin-bottom: 12px;
-            font-weight: 600;
-            color: #555;
-            font-size: 1.1em;
-        }
-
-        .writing-box {
-            width: 100%;
-            min-height: 400px;
-            padding: 20px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            line-height: 1.6;
-            font-family: 'Georgia', serif;
-            resize: vertical;
-            transition: border-color 0.3s ease;
-        }
-
-        .writing-box:focus {
-            outline: none;
-            border-color: #3498db;
-        }
-
-        .word-count {
-            text-align: right;
-            color: #7f8c8d;
-            font-size: 0.9em;
-            margin-top: 5px;
-        }
-
-        .submit-btn {
-            background: #27ae60;
-            color: white;
-            padding: 12px 30px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s ease;
-            width: 100%;
-        }
-
-        .submit-btn:hover {
-            background: #229954;
-        }
-
-        .submit-btn:disabled {
-            background: #bdc3c7;
-            cursor: not-allowed;
-        }
-
-        .expired {
-            background: linear-gradient(135deg, #95a5a6, #7f8c8d) !important;
-        }
-
-        @media (max-width: 600px) {
-            .top-section {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .timer {
-                align-self: center;
-            }
-            
-            .container {
-                margin: 10px;
-                padding: 20px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IELTS Writing Simulation</title>
+  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+    }
+    #timer {
+      text-align: center;
+      font-size: 20px;
+      color: red;
+      padding: 15px;
+      background: #fff;
+      border-bottom: 1px solid #ccc;
+    }
+    .main {
+      display: flex;
+      flex-direction: row;
+      height: calc(100vh - 60px);
+    }
+    .left, .right {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background: white;
+    }
+    .left {
+      border-right: 1px solid #ccc;
+    }
+    select, input, textarea, button {
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 10px;
+      font-size: 16px;
+    }
+    img {
+      max-width: 100%;
+      margin-bottom: 15px;
+    }
+    button {
+      background: #0078D7;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>IELTS Writing Practice</h1>
-            <p>Practice your writing skills with a timer</p>
-        </div>
+  <div id="timer">Time Remaining: 60:00</div>
 
-        <div class="top-section">
-            <div class="name-input">
-                <label for="studentName">Student Name:</label>
-                <input type="text" id="studentName" placeholder="Enter your name">
-            </div>
+  <div class="main">
+    <!-- LEFT PANEL: Task -->
+    <div class="left">
+      <label for="taskType">Choose Task:</label>
+      <select id="taskType">
+        <option value="task1">Task 1</option>
+        <option value="task2">Task 2</option>
+      </select>
 
-            <div class="timer" id="timerDisplay">
-                <span class="timer-display" id="timeDisplay">60:00</span>
-                <span class="timer-label">Minutes</span>
-                
-                <div class="timer-input">
-                    <input type="number" id="minutesInput" value="60" min="1" max="180">
-                    <label>min</label>
-                </div>
-                
-                <div class="timer-controls">
-                    <button class="timer-btn" id="startBtn" onclick="startTimer()">Start</button>
-                    <button class="timer-btn" id="pauseBtn" onclick="pauseTimer()" disabled>Pause</button>
-                    <button class="timer-btn" id="resetBtn" onclick="resetTimer()">Reset</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="task-section">
-            <label for="taskBox">Writing Task:</label>
-            <textarea id="taskBox" class="task-box" placeholder="Enter the IELTS writing task/prompt here for students to see..."></textarea>
-            
-            <div class="image-upload-section">
-                <label>Task Image (optional):</label>
-                <div class="image-upload">
-                    <input type="file" id="taskImageUpload" accept="image/*" onchange="handleImageUpload(event)">
-                    <label for="taskImageUpload" class="image-upload-label">
-                        📷 Click to upload chart/graph/image
-                    </label>
-                </div>
-                <div id="imagePreview" class="image-preview"></div>
-            </div>
-            
-            <div class="task-controls">
-                <button class="task-btn" onclick="saveTask()">Save Task</button>
-                <button class="task-btn" onclick="clearTask()">Clear Task</button>
-            </div>
-        </div>
-
-        <div class="writing-area">
-            <label for="writingBox">Your Writing:</label>
-            <textarea id="writingBox" class="writing-box" placeholder="Start writing your IELTS essay here..."></textarea>
-            <div class="word-count" id="wordCount">Word count: 0</div>
-        </div>
-
-        <button class="submit-btn" id="submitBtn" onclick="submitWriting()">Submit Writing</button>
+      <img id="taskImage" src="task1.jpg" alt="Task Image" />
+      <p id="taskText"><strong>Task 1:</strong> The chart below shows the percentage of households in different income groups that had internet access in 2020. Summarize the information by selecting and reporting the main features.</p>
     </div>
 
-    <script>
-        // Configuration - Add your email here
-        const TEACHER_EMAIL = 'thinhhooper2412@gmail.com'; // ← Replace with your actual email
-        
-        let timer = null;
-        let totalSeconds = 3600; // 60 minutes default
-        let remainingSeconds = totalSeconds;
-        let isRunning = false;
+    <!-- RIGHT PANEL: Writing -->
+    <div class="right">
+      <form id="writingForm">
+        <input type="text" name="student_name" placeholder="Enter your name" required />
+        <textarea name="writing" rows="15" placeholder="Write your essay here..." required></textarea>
+        <input type="hidden" name="task_type" id="hiddenTaskType" value="Task 1" />
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  </div>
 
-        function updateDisplay() {
-            const minutes = Math.floor(remainingSeconds / 60);
-            const seconds = remainingSeconds % 60;
-            document.getElementById('timeDisplay').textContent = 
-                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        }
+  <script>
+    emailjs.init("YOUR_USER_ID");
 
-        function startTimer() {
-            if (!isRunning) {
-                const minutesInput = document.getElementById('minutesInput');
-                if (!isRunning && remainingSeconds === totalSeconds) {
-                    totalSeconds = parseInt(minutesInput.value) * 60;
-                    remainingSeconds = totalSeconds;
-                }
-                
-                isRunning = true;
-                document.getElementById('startBtn').disabled = true;
-                document.getElementById('pauseBtn').disabled = false;
-                document.getElementById('minutesInput').disabled = true;
-                
-                timer = setInterval(() => {
-                    remainingSeconds--;
-                    updateDisplay();
-                    
-                    if (remainingSeconds <= 0) {
-                        timeUp();
-                    }
-                }, 1000);
-            }
-        }
+    // Task toggle logic
+    const taskTypeSelect = document.getElementById("taskType");
+    const taskText = document.getElementById("taskText");
+    const taskImage = document.getElementById("taskImage");
+    const hiddenTaskType = document.getElementById("hiddenTaskType");
 
-        function pauseTimer() {
-            if (isRunning) {
-                clearInterval(timer);
-                isRunning = false;
-                document.getElementById('startBtn').disabled = false;
-                document.getElementById('pauseBtn').disabled = true;
-            }
-        }
+    taskTypeSelect.addEventListener("change", () => {
+      if (taskTypeSelect.value === "task1") {
+        taskText.innerHTML = "<strong>Task 1:</strong> The chart below shows the percentage of households in different income groups that had internet access in 2020. Summarize the information by selecting and reporting the main features.";
+        taskImage.src = "task1.jpg";
+        hiddenTaskType.value = "Task 1";
+      } else {
+        taskText.innerHTML = "<strong>Task 2:</strong> Some people believe that unpaid community service should be a compulsory part of high school programs. To what extent do you agree or disagree?";
+        taskImage.src = "task2.jpg";
+        hiddenTaskType.value = "Task 2";
+      }
+    });
 
-        function resetTimer() {
-            clearInterval(timer);
-            isRunning = false;
-            const minutesInput = document.getElementById('minutesInput');
-            totalSeconds = parseInt(minutesInput.value) * 60;
-            remainingSeconds = totalSeconds;
-            
-            updateDisplay();
-            document.getElementById('startBtn').disabled = false;
-            document.getElementById('pauseBtn').disabled = true;
-            document.getElementById('minutesInput').disabled = false;
-            document.getElementById('timerDisplay').classList.remove('expired');
-            document.getElementById('submitBtn').disabled = false;
-        }
+    // Countdown Timer
+    let time = 60 * 60;
+    const timerDisplay = document.getElementById("timer");
 
-        function timeUp() {
-            clearInterval(timer);
-            isRunning = false;
-            document.getElementById('timerDisplay').classList.add('expired');
-            document.getElementById('timeDisplay').textContent = '00:00';
-            document.getElementById('startBtn').disabled = true;
-            document.getElementById('pauseBtn').disabled = true;
-            alert('Time\'s up! Please submit your writing.');
-        }
+    const updateTimer = () => {
+      const minutes = Math.floor(time / 60);
+      const seconds = time % 60;
+      timerDisplay.textContent = `Time Remaining: ${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+      if (time > 0) time--;
+    };
+    setInterval(updateTimer, 1000);
 
-        function updateWordCount() {
-            const text = document.getElementById('writingBox').value;
-            const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
-            document.getElementById('wordCount').textContent = `Word count: ${words}`;
-        }
+    // Form Submission
+    document.getElementById("writingForm").addEventListener("submit", function(e) {
+      e.preventDefault();
 
-        // Task Management - Edit these variables to set tasks for students
-        const CURRENT_TASK = {
-            text: `Task 2: Some people believe that technology has made our lives more convenient, while others argue that it has made us more dependent and less capable.
-
-Discuss both views and give your own opinion.
-
-Write at least 250 words.`,
-            
-            image: null  // Add image filename here: 'your-image.png'
-            // For multiple images use: images: ['image1.png', 'image2.png']
-        };
-
-        let currentTaskImage = null;
-
-
-
-        function displayCurrentTask() {
-            const taskDisplay = document.getElementById('currentTaskDisplay');
-            
-            if (CURRENT_TASK.text || CURRENT_TASK.image || CURRENT_TASK.images) {
-                let imageHtml = '';
-                
-                // Handle single image
-                if (CURRENT_TASK.image) {
-                    imageHtml = `<img src="${CURRENT_TASK.image}" alt="Task Image" class="task-image">`;
-                }
-                
-                // Handle multiple images
-                if (CURRENT_TASK.images && CURRENT_TASK.images.length > 0) {
-                    imageHtml = CURRENT_TASK.images.map((img, index) => 
-                        `<img src="${img}" alt="Task Image ${index + 1}" class="task-image" style="margin-bottom: 10px;">`
-                    ).join('');
-                }
-                
-                taskDisplay.innerHTML = `
-                    <h3>📝 Writing Task</h3>
-                    <div class="task-content">${CURRENT_TASK.text || ''}</div>
-                    ${imageHtml}
-                `;
-            } else {
-                taskDisplay.innerHTML = `<div class="no-task">No task set yet. Teacher needs to set a writing task.</div>`;
-            }
-        }
-
-        function setTask() {
-            const taskText = document.getElementById('taskBox').value.trim();
-            if (taskText || currentTaskImage) {
-                // Show preview of what students will see
-                const preview = `
-                    <h3>✅ Task Set Successfully!</h3>
-                    <p style="color: #27ae60; margin-bottom: 15px;"><strong>Students will now see:</strong></p>
-                    <div class="task-content">${taskText}</div>
-                    ${currentTaskImage ? `<img src="${currentTaskImage}" alt="Task Image" class="task-image">` : ''}
-                    <p style="color: #e74c3c; margin-top: 15px; font-size: 0.9em;">
-                        <strong>Note:</strong> To permanently save this task for all students, you need to update the HTML code and re-upload to GitHub.
-                    </p>
-                `;
-                
-                document.getElementById('currentTaskDisplay').innerHTML = preview;
-                alert('Task set! Students can now see this task.\n\nTo make it permanent: Update the CURRENT_TASK variable in the code and re-upload to GitHub.');
-            } else {
-                alert('Please enter a task or upload an image first.');
-            }
-        }
-
-        function clearTask() {
-            document.getElementById('taskBox').value = '';
-            removeImage();
-            document.getElementById('currentTaskDisplay').innerHTML = `<div class="no-task">No task set.</div>`;
-        }
-
-        function toggleTeacherMode() {
-            const controls = document.getElementById('teacherControls');
-            const btn = document.querySelector('.teacher-mode-btn') || document.createElement('button');
-            
-            teacherModeVisible = !teacherModeVisible;
-            
-            if (teacherModeVisible) {
-                controls.style.display = 'block';
-                btn.textContent = 'Hide Teacher Controls';
-                btn.onclick = toggleTeacherMode;
-            } else {
-                controls.style.display = 'none';
-                btn.textContent = 'Show Teacher Controls';
-                btn.className = 'teacher-mode-btn';
-                btn.onclick = toggleTeacherMode;
-                if (!document.body.contains(btn)) {
-                    document.body.appendChild(btn);
-                }
-            }
-        }
-
-        function handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    currentTaskImage = e.target.result;
-                    displayImagePreview(currentTaskImage, file.name);
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function displayImagePreview(imageSrc, fileName) {
-            const preview = document.getElementById('imagePreview');
-            preview.innerHTML = `
-                <div>
-                    <img src="${imageSrc}" alt="Task Image">
-                    <div>
-                        <small style="color: #666;">📎 ${fileName}</small>
-                        <button class="remove-image-btn" onclick="removeImage()">Remove</button>
-                    </div>
-                </div>
-            `;
-        }
-
-        function removeImage() {
-            currentTaskImage = null;
-            document.getElementById('imagePreview').innerHTML = '';
-            document.getElementById('taskImageUpload').value = '';
-        }
-
-        function saveTask() {
-            // This function is now replaced by setTask()
-            setTask();
-        }
-
-        function loadTask() {
-            // Load the default task
-            displayCurrentTask();
-        }
-
-        function submitWriting() {
-            const studentName = document.getElementById('studentName').value.trim();
-            const writingText = document.getElementById('writingBox').value.trim();
-            
-            if (!studentName) {
-                alert('Please enter your name.');
-                return;
-            }
-            
-            if (!writingText) {
-                alert('Please write something before submitting.');
-                return;
-            }
-            
-            const words = writingText.split(/\s+/).length;
-            const timeUsed = totalSeconds - remainingSeconds;
-            const minutesUsed = Math.floor(timeUsed / 60);
-            const secondsUsed = timeUsed % 60;
-            const timeUsedFormatted = `${minutesUsed}:${secondsUsed.toString().padStart(2, '0')}`;
-            
-            // Create email body
-            const emailBody = `Writing Task: ${CURRENT_TASK.text || 'No task specified'}
-
-Student Name: ${studentName}
-Word Count: ${words} words
-Time Used: ${timeUsedFormatted}
-Submission Date: ${new Date().toLocaleString()}
-
-Student's Writing:
-${writingText}`;
-            
-            // Create mailto link
-            const subject = `IELTS Writing Submission - ${studentName}`;
-            const mailtoLink = `mailto:${TEACHER_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
-            
-            // Open email client
-            window.open(mailtoLink);
-            
-            // Show success message
-            alert(`Submission prepared for ${studentName}!\n\nWord count: ${words}\nTime used: ${timeUsedFormatted}\n\nYour email client should open to send the submission.`);
-            
-            // Reset everything after a delay
-            setTimeout(() => {
-                document.getElementById('writingBox').value = '';
-                document.getElementById('studentName').value = '';
-                updateWordCount();
-                resetTimer();
-            }, 2000);
-        }
-
-        // Initialize
-        document.getElementById('writingBox').addEventListener('input', updateWordCount);
-        document.getElementById('minutesInput').addEventListener('change', function() {
-            if (!isRunning) {
-                resetTimer();
-            }
+      emailjs.sendForm("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", this)
+        .then(() => {
+          alert("Essay submitted successfully!");
+          this.reset();
+        }, (error) => {
+          alert("Failed to send. Please try again.");
+          console.error(error);
         });
-        
-        updateDisplay();
-        updateWordCount();
-        loadTask(); // Load any saved task
-    </script>
+    });
+  </script>
 </body>
 </html>
