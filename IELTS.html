@@ -79,7 +79,7 @@
   </div>
 
   <script>
-    emailjs.init("YOUR_USER_ID");
+    emailjs.init("1DAm6gd8jhWc0i2n4");
 
     // Task toggle logic
     const taskTypeSelect = document.getElementById("taskType");
@@ -115,7 +115,7 @@
     document.getElementById("writingForm").addEventListener("submit", function(e) {
       e.preventDefault();
 
-      emailjs.sendForm("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", this)
+      emailjs.sendForm("service_l4zctd8", "template_qb2tjpz", this)
         .then(() => {
           alert("Essay submitted successfully!");
           this.reset();
