@@ -1,129 +1,678 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>IELTS Writing Simulation</title>
-  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-    }
-    #timer {
-      text-align: center;
-      font-size: 20px;
-      color: red;
-      padding: 15px;
-      background: #fff;
-      border-bottom: 1px solid #ccc;
-    }
-    .main {
-      display: flex;
-      flex-direction: row;
-      height: calc(100vh - 60px);
-    }
-    .left, .right {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
-      background: white;
-    }
-    .left {
-      border-right: 1px solid #ccc;
-    }
-    select, input, textarea, button {
-      width: 100%;
-      margin-bottom: 15px;
-      padding: 10px;
-      font-size: 16px;
-    }
-    img {
-      max-width: 100%;
-      margin-bottom: 15px;
-    }
-    button {
-      background: #0078D7;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Writing Test</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background-color: #003366;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: normal;
+        }
+
+        .timer-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .timer {
+            background-color: #fff;
+            color: #003366;
+            padding: 8px 20px;
+            border-radius: 5px;
+            font-size: 20px;
+            font-weight: bold;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .timer.warning {
+            background-color: #ff9800;
+            color: white;
+        }
+
+        .timer.danger {
+            background-color: #f44336;
+            color: white;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            background-color: #e8e8e8;
+            padding: 15px 30px;
+            border-bottom: 2px solid #ccc;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        input[type="text"], input[type="number"] {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        input[type="text"] {
+            width: 200px;
+        }
+
+        input[type="number"] {
+            width: 80px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .submit-btn {
+            background-color: #2196F3;
+        }
+
+        .submit-btn:hover {
+            background-color: #0b7dda;
+        }
+
+        .stop-btn {
+            background-color: #f44336;
+        }
+
+        .stop-btn:hover {
+            background-color: #da190b;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            padding: 20px 30px;
+            gap: 20px;
+            overflow: hidden;
+        }
+
+        /* Task Panel */
+        .task-panel {
+            flex: 1;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .task-panel h2 {
+            color: #003366;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .task-selector {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .task-btn {
+            padding: 8px 16px;
+            background-color: #f0f0f0;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .task-btn.active {
+            background-color: #003366;
+            color: white;
+            border-color: #003366;
+        }
+
+        .task-content {
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .task-content h3 {
+            color: #003366;
+            margin: 15px 0 10px;
+        }
+
+        .task-content p {
+            margin-bottom: 10px;
+        }
+
+        .task-question {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-left: 4px solid #003366;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+
+        .task-image {
+            max-width: 100%;
+            height: auto;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        /* Writing Panel */
+        .writing-panel {
+            flex: 1;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .writing-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .writing-header h2 {
+            color: #003366;
+            font-size: 20px;
+        }
+
+        .word-count {
+            background-color: #f0f0f0;
+            padding: 5px 15px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .writing-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        textarea.answer-area {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            line-height: 1.6;
+            resize: none;
+            font-family: Arial, sans-serif;
+        }
+
+        textarea.answer-area:focus {
+            outline: none;
+            border-color: #2196F3;
+            box-shadow: 0 0 5px rgba(33, 150, 243, 0.3);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 400px;
+            text-align: center;
+            animation: slideIn 0.3s;
+        }
+
+        .modal-content h2 {
+            color: #4CAF50;
+            margin-bottom: 15px;
+        }
+
+        .modal-content p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .control-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div id="timer">Time Remaining: 60:00</div>
-
-  <div class="main">
-    <!-- LEFT PANEL: Task -->
-    <div class="left">
-      <label for="taskType">Choose Task:</label>
-      <select id="taskType">
-        <option value="task1">Task 1</option>
-        <option value="task2">Task 2</option>
-      </select>
-
-      <img id="taskImage" src="task1.jpg" alt="Task Image" />
-      <p id="taskText"><strong>Task 1:</strong> The chart below shows the percentage of households in different income groups that had internet access in 2020. Summarize the information by selecting and reporting the main features.</p>
+    <!-- Header -->
+    <div class="header">
+        <h1>IELTS Academic Writing Test</h1>
+        <div class="timer-section">
+            <span style="color: white;">Time Remaining:</span>
+            <div id="timer" class="timer">60:00</div>
+        </div>
     </div>
 
-    <!-- RIGHT PANEL: Writing -->
-    <div class="right">
-      <form id="writingForm">
-        <input type="text" name="student_name" placeholder="Enter your name" required />
-        <textarea name="writing" rows="15" placeholder="Write your essay here..." required></textarea>
-        <input type="hidden" name="task_type" id="hiddenTaskType" value="Task 1" />
-        <button type="submit">Submit</button>
-      </form>
+    <!-- Control Panel -->
+    <div class="control-panel">
+        <div class="control-row">
+            <div class="control-group">
+                <label for="studentName">Student Name:</label>
+                <input type="text" id="studentName" placeholder="Enter your name">
+            </div>
+            <div class="control-group">
+                <label for="testDuration">Duration (min):</label>
+                <input type="number" id="testDuration" value="60" min="1" max="180">
+            </div>
+            <button onclick="startTest()" id="startBtn">Start Test</button>
+            <button onclick="stopTest()" id="stopBtn" class="stop-btn" disabled>Stop Test</button>
+            <button onclick="submitTest()" id="submitBtn" class="submit-btn" disabled>Submit Test</button>
+        </div>
     </div>
-  </div>
 
-  <script>
-    emailjs.init("1DAm6gd8jhWc0i2n4");
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Task Panel -->
+        <div class="task-panel">
+            <h2>Writing Tasks</h2>
+            <div class="task-selector">
+                <button class="task-btn active" onclick="switchTask(1)">Task 1</button>
+                <button class="task-btn" onclick="switchTask(2)">Task 2</button>
+            </div>
+            <div id="task1Content" class="task-content">
+                <h3>Writing Task 1</h3>
+                <p>You should spend about 20 minutes on this task.</p>
+                <img id="task1Img" class="task-image" style="display:none;">
+                <div class="task-question" id="task1QuestionDisplay">
+                    The graph below shows the average monthly temperatures and rainfall in London throughout the year.
+                    <br><br>
+                    Summarise the information by selecting and reporting the main features, and make comparisons where relevant.
+                </div>
+                <p><strong>Write at least 150 words.</strong></p>
+            </div>
+            <div id="task2Content" class="task-content" style="display:none;">
+                <h3>Writing Task 2</h3>
+                <p>You should spend about 40 minutes on this task.</p>
+                <p>Write about the following topic:</p>
+                <img id="task2Img" class="task-image" style="display:none;">
+                <div class="task-question" id="task2QuestionDisplay">
+                    Some people believe that unpaid community service should be a compulsory part of high school programs (for example working for a charity, improving the neighbourhood or teaching sports to younger children).
+                    <br><br>
+                    To what extent do you agree or disagree?
+                </div>
+                <p>Give reasons for your answer and include any relevant examples from your own knowledge or experience.</p>
+                <p><strong>Write at least 250 words.</strong></p>
+            </div>
+        </div>
 
-    // Task toggle logic
-    const taskTypeSelect = document.getElementById("taskType");
-    const taskText = document.getElementById("taskText");
-    const taskImage = document.getElementById("taskImage");
-    const hiddenTaskType = document.getElementById("hiddenTaskType");
+        <!-- Writing Panel -->
+        <div class="writing-panel">
+            <div class="writing-header">
+                <h2 id="currentTaskTitle">Task 1 Response</h2>
+                <div class="word-count">Words: <span id="wordCount">0</span></div>
+            </div>
+            <div class="writing-area">
+                <textarea id="task1Answer" class="answer-area" placeholder="Start writing your Task 1 response here..." oninput="updateWordCount()"></textarea>
+                <textarea id="task2Answer" class="answer-area" placeholder="Start writing your Task 2 response here..." oninput="updateWordCount()" style="display:none;"></textarea>
+            </div>
+        </div>
+    </div>
 
-    taskTypeSelect.addEventListener("change", () => {
-      if (taskTypeSelect.value === "task1") {
-        taskText.innerHTML = "<strong>Task 1:</strong> The chart below shows the percentage of households in different income groups that had internet access in 2020. Summarize the information by selecting and reporting the main features.";
-        taskImage.src = "task1.jpg";
-        hiddenTaskType.value = "Task 1";
-      } else {
-        taskText.innerHTML = "<strong>Task 2:</strong> Some people believe that unpaid community service should be a compulsory part of high school programs. To what extent do you agree or disagree?";
-        taskImage.src = "task2.jpg";
-        hiddenTaskType.value = "Task 2";
-      }
-    });
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <h2>✓ Test Submitted Successfully!</h2>
+            <p>Your responses have been recorded.</p>
+            <button onclick="closeModal()">Close</button>
+        </div>
+    </div>
 
-    // Countdown Timer
-    let time = 60 * 60;
-    const timerDisplay = document.getElementById("timer");
+    <script>
+        let currentTask = 1;
+        let timerInterval;
+        let testActive = false;
+        let timeRemaining = 3600; // 60 minutes in seconds
 
-    const updateTimer = () => {
-      const minutes = Math.floor(time / 60);
-      const seconds = time % 60;
-      timerDisplay.textContent = `Time Remaining: ${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-      if (time > 0) time--;
-    };
-    setInterval(updateTimer, 1000);
+        // Configuration - You can modify these values
+        const CONFIG = {
+            googleScriptUrl: 'https://script.google.com/macros/s/AKfycbww2gZHjCdwvJudNMgzvb5SFbYNiSMz-ajudajYWI2JaweXm9mZMKb3lP49JV4ICiw/exec'
+            // EmailJS Configuration (optional - leave empty if not using email)
+            emailjs: {
+                serviceId: 'service_l4zctd8', // Your EmailJS service ID
+                templateId: 'template_qb2tjpz', // Your EmailJS template ID  
+                publicKey: '1DAm6gd8jhWc0i2n4' // Your EmailJS public key
+            },
+            
+            // Task 1 Configuration
+            task1: {
+                question: `The graph below shows the average monthly temperatures and rainfall in London throughout the year.
 
-    // Form Submission
-    document.getElementById("writingForm").addEventListener("submit", function(e) {
-      e.preventDefault();
+Summarise the information by selecting and reporting the main features, and make comparisons where relevant.`,
+                imageUrl: '' // Add your Task 1 image URL here
+            },
+            
+            // Task 2 Configuration  
+            task2: {
+                question: `Some people believe that unpaid community service should be a compulsory part of high school programs (for example working for a charity, improving the neighbourhood or teaching sports to younger children).
 
-      emailjs.sendForm("service_l4zctd8", "template_qb2tjpz", this)
-        .then(() => {
-          alert("Essay submitted successfully!");
-          this.reset();
-        }, (error) => {
-          alert("Failed to send. Please try again.");
-          console.error(error);
-        });
-    });
-  </script>
+To what extent do you agree or disagree?`,
+                imageUrl: '' // Add your Task 2 image URL here
+            }
+        };
+
+        // Initialize the test on page load
+        window.onload = function() {
+            initializeTest();
+        };
+
+        function initializeTest() {
+            // Initialize EmailJS if configured
+            if (CONFIG.emailjs.publicKey) {
+                emailjs.init(CONFIG.emailjs.publicKey);
+            }
+            
+            // Set up task questions
+            document.getElementById('task1QuestionDisplay').innerHTML = CONFIG.task1.question.replace(/\n/g, '<br>');
+            document.getElementById('task2QuestionDisplay').innerHTML = CONFIG.task2.question.replace(/\n/g, '<br>');
+            
+            // Set up task images if provided
+            if (CONFIG.task1.imagePath) {
+                const task1Img = document.getElementById('task1Img');
+                task1Img.src = CONFIG.task1.imagePath;
+                task1Img.style.display = 'block';
+            }
+            
+            if (CONFIG.task2.imagePath) {
+                const task2Img = document.getElementById('task2Img');
+                task2Img.src = CONFIG.task2.imagePath;
+                task2Img.style.display = 'block';
+            }
+        }
+
+        function switchTask(taskNum) {
+            currentTask = taskNum;
+            
+            // Update task buttons
+            document.querySelectorAll('.task-btn').forEach((btn, index) => {
+                btn.classList.toggle('active', index === taskNum - 1);
+            });
+            
+            // Show/hide task content
+            document.getElementById('task1Content').style.display = taskNum === 1 ? 'block' : 'none';
+            document.getElementById('task2Content').style.display = taskNum === 2 ? 'block' : 'none';
+            
+            // Show/hide answer areas
+            document.getElementById('task1Answer').style.display = taskNum === 1 ? 'block' : 'none';
+            document.getElementById('task2Answer').style.display = taskNum === 2 ? 'block' : 'none';
+            
+            // Update header
+            document.getElementById('currentTaskTitle').textContent = `Task ${taskNum} Response`;
+            
+            // Update word count
+            updateWordCount();
+        }
+
+        function updateWordCount() {
+            const textarea = currentTask === 1 ? 
+                document.getElementById('task1Answer') : 
+                document.getElementById('task2Answer');
+            
+            const text = textarea.value.trim();
+            const words = text === '' ? 0 : text.split(/\s+/).length;
+            document.getElementById('wordCount').textContent = words;
+        }
+
+        function startTest() {
+            const studentName = document.getElementById('studentName').value.trim();
+            if (!studentName) {
+                alert('Please enter your name before starting the test.');
+                return;
+            }
+            
+            const duration = parseInt(document.getElementById('testDuration').value);
+            timeRemaining = duration * 60;
+            
+            testActive = true;
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('stopBtn').disabled = false;
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('studentName').disabled = true;
+            document.getElementById('testDuration').disabled = true;
+            
+            startTimer();
+        }
+
+        function stopTest() {
+            if (confirm('Are you sure you want to stop the test? All progress will be lost.')) {
+                resetTest();
+            }
+        }
+
+        function resetTest() {
+            testActive = false;
+            clearInterval(timerInterval);
+            
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('studentName').disabled = false;
+            document.getElementById('testDuration').disabled = false;
+            
+            document.getElementById('timer').textContent = '60:00';
+            document.getElementById('timer').className = 'timer';
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                
+                const minutes = Math.floor(timeRemaining / 60);
+                const seconds = timeRemaining % 60;
+                const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                const timerElement = document.getElementById('timer');
+                timerElement.textContent = display;
+                
+                // Change timer color based on time remaining
+                if (timeRemaining <= 300) { // 5 minutes
+                    timerElement.className = 'timer danger';
+                } else if (timeRemaining <= 600) { // 10 minutes
+                    timerElement.className = 'timer warning';
+                } else {
+                    timerElement.className = 'timer';
+                }
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest();
+                }
+            }, 1000);
+        }
+
+        function submitTest() {
+            if (!testActive) return;
+            
+            const studentName = document.getElementById('studentName').value;
+            const task1Answer = document.getElementById('task1Answer').value;
+            const task2Answer = document.getElementById('task2Answer').value;
+            const task1Question = document.getElementById('task1QuestionDisplay').textContent;
+            const task2Question = document.getElementById('task2QuestionDisplay').textContent;
+            
+            const task1Words = task1Answer.trim() === '' ? 0 : task1Answer.trim().split(/\s+/).length;
+            const task2Words = task2Answer.trim() === '' ? 0 : task2Answer.trim().split(/\s+/).length;
+            
+            // Prepare submission data
+            const submissionData = {
+                timestamp: new Date().toLocaleString(),
+                student_name: studentName,
+                test_date: new Date().toLocaleDateString(),
+                test_time: new Date().toLocaleTimeString(),
+                task1_question: task1Question.replace(/\n/g, ' ').trim(),
+                task1_answer: task1Answer || 'No answer provided',
+                task1_words: task1Words,
+                task2_question: task2Question.replace(/\n/g, ' ').trim(),
+                task2_answer: task2Answer || 'No answer provided',
+                task2_words: task2Words,
+                total_time: document.getElementById('testDuration').value + ' minutes',
+                total_words: task1Words + task2Words
+            };
+            
+            // Send to Google Sheets if configured
+            if (CONFIG.googleScriptUrl) {
+                fetch(CONFIG.googleScriptUrl, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(submissionData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Google Sheets submission successful:', data);
+                    showSuccessModal();
+                    resetTest();
+                })
+                .catch(error => {
+                    console.error('Google Sheets submission error:', error);
+                    // Try EmailJS as backup
+                    tryEmailSubmission(submissionData);
+                });
+            } else if (CONFIG.emailjs.serviceId && CONFIG.emailjs.templateId && CONFIG.emailjs.publicKey) {
+                // Send email if Google Sheets not configured but EmailJS is
+                tryEmailSubmission(submissionData);
+            } else {
+                // Show local submission success
+                console.log('Test submission (local):', submissionData);
+                showSuccessModal();
+                resetTest();
+            }
+        }
+
+        function tryEmailSubmission(submissionData) {
+            emailjs.send(CONFIG.emailjs.serviceId, CONFIG.emailjs.templateId, submissionData)
+                .then(function(response) {
+                    console.log('Email sent successfully!', response.status, response.text);
+                    showSuccessModal();
+                    resetTest();
+                }, function(error) {
+                    console.log('Email failed to send:', error);
+                    alert('Failed to submit test. Please try again or contact your teacher.');
+                });
+        }
+
+        function showSuccessModal() {
+            document.getElementById('successModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('successModal').classList.remove('show');
+            // Clear answers
+            document.getElementById('task1Answer').value = '';
+            document.getElementById('task2Answer').value = '';
+            document.getElementById('studentName').value = '';
+            updateWordCount();
+        }
+
+        // Initialize word count on page load
+        updateWordCount();
+    </script>
 </body>
 </html>
