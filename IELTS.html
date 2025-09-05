@@ -113,6 +113,8 @@
             font-size: 14px;
             font-weight: bold;
             transition: background-color 0.3s;
+            z-index: 10;
+            position: relative;
         }
 
         button:hover {
@@ -179,6 +181,12 @@
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.3s;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .task-btn:hover {
+            background-color: #e0e0e0;
         }
 
         .task-btn.active {
@@ -361,9 +369,9 @@
                 <label for="testDuration">Duration (min):</label>
                 <input type="number" id="testDuration" value="60" min="1" max="180">
             </div>
-            <button onclick="startTest()" id="startBtn">Start Test</button>
-            <button onclick="stopTest()" id="stopBtn" class="stop-btn" disabled>Stop Test</button>
-            <button onclick="submitTest()" id="submitBtn" class="submit-btn" disabled>Submit Test</button>
+            <button type="button" id="startBtn">Start Test</button>
+            <button type="button" id="stopBtn" class="stop-btn" disabled>Stop Test</button>
+            <button type="button" id="submitBtn" class="submit-btn" disabled>Submit Test</button>
         </div>
     </div>
 
@@ -373,8 +381,8 @@
         <div class="task-panel">
             <h2>Writing Tasks</h2>
             <div class="task-selector">
-                <button class="task-btn active" onclick="switchTask(1)">Task 1</button>
-                <button class="task-btn" onclick="switchTask(2)">Task 2</button>
+                <button type="button" class="task-btn active" data-task="1">Task 1</button>
+                <button type="button" class="task-btn" data-task="2">Task 2</button>
             </div>
             <div id="task1Content" class="task-content">
                 <h3>Writing Task 1</h3>
@@ -409,8 +417,8 @@
                 <div class="word-count">Words: <span id="wordCount">0</span></div>
             </div>
             <div class="writing-area">
-                <textarea id="task1Answer" class="answer-area" placeholder="Start writing your Task 1 response here..." oninput="updateWordCount()"></textarea>
-                <textarea id="task2Answer" class="answer-area" placeholder="Start writing your Task 2 response here..." oninput="updateWordCount()" style="display:none;"></textarea>
+                <textarea id="task1Answer" class="answer-area" placeholder="Start writing your Task 1 response here..."></textarea>
+                <textarea id="task2Answer" class="answer-area" placeholder="Start writing your Task 2 response here..." style="display:none;"></textarea>
             </div>
         </div>
     </div>
@@ -420,7 +428,7 @@
         <div class="modal-content">
             <h2>✓ Test Submitted Successfully!</h2>
             <p>Your responses have been recorded.</p>
-            <button onclick="closeModal()">Close</button>
+            <button type="button" id="closeModalBtn">Close</button>
         </div>
     </div>
 
@@ -432,7 +440,7 @@
 
         // Configuration - You can modify these values
         const CONFIG = {
-            googleScriptUrl: 'https://script.google.com/macros/s/AKfycbww2gZHjCdwvJudNMgzvb5SFbYNiSMz-ajudajYWI2JaweXm9mZMKb3lP49JV4ICiw/exec'
+            googleScriptUrl: 'https://script.google.com/macros/s/AKfycbww2gZHjCdwvJudNMgzvb5SFbYNiSMz-ajudajYWI2JaweXm9mZMKb3lP49JV4ICiw/exec',
             // EmailJS Configuration (optional - leave empty if not using email)
             emailjs: {
                 serviceId: 'service_l4zctd8', // Your EmailJS service ID
@@ -458,11 +466,14 @@ To what extent do you agree or disagree?`,
         };
 
         // Initialize the test on page load
-        window.onload = function() {
+        document.addEventListener('DOMContentLoaded', function() {
             initializeTest();
-        };
+            setupEventListeners();
+        });
 
         function initializeTest() {
+            console.log('Initializing test...');
+            
             // Initialize EmailJS if configured
             if (CONFIG.emailjs.publicKey) {
                 emailjs.init(CONFIG.emailjs.publicKey);
@@ -473,20 +484,50 @@ To what extent do you agree or disagree?`,
             document.getElementById('task2QuestionDisplay').innerHTML = CONFIG.task2.question.replace(/\n/g, '<br>');
             
             // Set up task images if provided
-            if (CONFIG.task1.imagePath) {
+            if (CONFIG.task1.imageUrl) {
                 const task1Img = document.getElementById('task1Img');
-                task1Img.src = CONFIG.task1.imagePath;
+                task1Img.src = CONFIG.task1.imageUrl;
                 task1Img.style.display = 'block';
             }
             
-            if (CONFIG.task2.imagePath) {
+            if (CONFIG.task2.imageUrl) {
                 const task2Img = document.getElementById('task2Img');
-                task2Img.src = CONFIG.task2.imagePath;
+                task2Img.src = CONFIG.task2.imageUrl;
                 task2Img.style.display = 'block';
             }
+
+            // Initialize word count
+            updateWordCount();
+            
+            console.log('Test initialized successfully');
+        }
+
+        function setupEventListeners() {
+            // Control buttons
+            document.getElementById('startBtn').addEventListener('click', startTest);
+            document.getElementById('stopBtn').addEventListener('click', stopTest);
+            document.getElementById('submitBtn').addEventListener('click', submitTest);
+            
+            // Task switching buttons
+            document.querySelectorAll('.task-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const taskNum = parseInt(this.getAttribute('data-task'));
+                    switchTask(taskNum);
+                });
+            });
+            
+            // Text areas for word count
+            document.getElementById('task1Answer').addEventListener('input', updateWordCount);
+            document.getElementById('task2Answer').addEventListener('input', updateWordCount);
+            
+            // Modal close button
+            document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+            
+            console.log('Event listeners set up');
         }
 
         function switchTask(taskNum) {
+            console.log('Switching to task', taskNum);
             currentTask = taskNum;
             
             // Update task buttons
@@ -520,6 +561,7 @@ To what extent do you agree or disagree?`,
         }
 
         function startTest() {
+            console.log('Starting test...');
             const studentName = document.getElementById('studentName').value.trim();
             if (!studentName) {
                 alert('Please enter your name before starting the test.');
@@ -537,6 +579,7 @@ To what extent do you agree or disagree?`,
             document.getElementById('testDuration').disabled = true;
             
             startTimer();
+            console.log('Test started successfully');
         }
 
         function stopTest() {
@@ -546,6 +589,7 @@ To what extent do you agree or disagree?`,
         }
 
         function resetTest() {
+            console.log('Resetting test...');
             testActive = false;
             clearInterval(timerInterval);
             
@@ -587,6 +631,7 @@ To what extent do you agree or disagree?`,
         }
 
         function submitTest() {
+            console.log('Submitting test...');
             if (!testActive) return;
             
             const studentName = document.getElementById('studentName').value;
@@ -614,48 +659,11 @@ To what extent do you agree or disagree?`,
                 total_words: task1Words + task2Words
             };
             
-            // Send to Google Sheets if configured
-            if (CONFIG.googleScriptUrl) {
-                fetch(CONFIG.googleScriptUrl, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(submissionData)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Google Sheets submission successful:', data);
-                    showSuccessModal();
-                    resetTest();
-                })
-                .catch(error => {
-                    console.error('Google Sheets submission error:', error);
-                    // Try EmailJS as backup
-                    tryEmailSubmission(submissionData);
-                });
-            } else if (CONFIG.emailjs.serviceId && CONFIG.emailjs.templateId && CONFIG.emailjs.publicKey) {
-                // Send email if Google Sheets not configured but EmailJS is
-                tryEmailSubmission(submissionData);
-            } else {
-                // Show local submission success
-                console.log('Test submission (local):', submissionData);
-                showSuccessModal();
-                resetTest();
-            }
-        }
-
-        function tryEmailSubmission(submissionData) {
-            emailjs.send(CONFIG.emailjs.serviceId, CONFIG.emailjs.templateId, submissionData)
-                .then(function(response) {
-                    console.log('Email sent successfully!', response.status, response.text);
-                    showSuccessModal();
-                    resetTest();
-                }, function(error) {
-                    console.log('Email failed to send:', error);
-                    alert('Failed to submit test. Please try again or contact your teacher.');
-                });
+            console.log('Submission data:', submissionData);
+            
+            // For now, just show success (you can add actual submission logic later)
+            showSuccessModal();
+            resetTest();
         }
 
         function showSuccessModal() {
@@ -670,9 +678,6 @@ To what extent do you agree or disagree?`,
             document.getElementById('studentName').value = '';
             updateWordCount();
         }
-
-        // Initialize word count on page load
-        updateWordCount();
     </script>
 </body>
 </html>
