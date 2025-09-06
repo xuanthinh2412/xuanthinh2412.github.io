@@ -453,7 +453,7 @@
                 question: `The graph below shows the average monthly temperatures and rainfall in London throughout the year.
 
 Summarise the information by selecting and reporting the main features, and make comparisons where relevant.`,
-                imageUrl: '' // Add your Task 1 image URL here
+                imagePath: 'task1.jpg' // Path to your Task 1 image
             },
             
             // Task 2 Configuration  
@@ -461,7 +461,7 @@ Summarise the information by selecting and reporting the main features, and make
                 question: `Some people believe that unpaid community service should be a compulsory part of high school programs (for example working for a charity, improving the neighbourhood or teaching sports to younger children).
 
 To what extent do you agree or disagree?`,
-                imageUrl: '' // Add your Task 2 image URL here
+                imagePath: 'task2.jpg' // Path to your Task 2 image
             }
         };
 
@@ -484,16 +484,28 @@ To what extent do you agree or disagree?`,
             document.getElementById('task2QuestionDisplay').innerHTML = CONFIG.task2.question.replace(/\n/g, '<br>');
             
             // Set up task images if provided
-            if (CONFIG.task1.imageUrl) {
+            if (CONFIG.task1.imagePath) {
                 const task1Img = document.getElementById('task1Img');
-                task1Img.src = CONFIG.task1.imageUrl;
+                task1Img.src = CONFIG.task1.imagePath;
                 task1Img.style.display = 'block';
+                
+                // Handle image load errors
+                task1Img.onerror = function() {
+                    console.log('Task 1 image not found:', CONFIG.task1.imagePath);
+                    this.style.display = 'none';
+                };
             }
             
-            if (CONFIG.task2.imageUrl) {
+            if (CONFIG.task2.imagePath) {
                 const task2Img = document.getElementById('task2Img');
-                task2Img.src = CONFIG.task2.imageUrl;
+                task2Img.src = CONFIG.task2.imagePath;
                 task2Img.style.display = 'block';
+                
+                // Handle image load errors
+                task2Img.onerror = function() {
+                    console.log('Task 2 image not found:', CONFIG.task2.imagePath);
+                    this.style.display = 'none';
+                };
             }
 
             // Initialize word count
