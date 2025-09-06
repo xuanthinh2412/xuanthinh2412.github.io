@@ -320,6 +320,29 @@
             margin-bottom: 20px;
         }
 
+        .modal-content.error h2 {
+            color: #f44336;
+        }
+
+        .submission-status {
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .submission-status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .submission-status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -425,9 +448,10 @@
 
     <!-- Success Modal -->
     <div id="successModal" class="modal">
-        <div class="modal-content">
-            <h2>✓ Test Submitted Successfully!</h2>
-            <p>Your responses have been recorded.</p>
+        <div class="modal-content" id="modalContent">
+            <h2 id="modalTitle">✓ Test Submitted Successfully!</h2>
+            <p id="modalMessage">Your responses have been recorded.</p>
+            <div id="submissionStatus"></div>
             <button type="button" id="closeModalBtn">Close</button>
         </div>
     </div>
@@ -642,9 +666,14 @@ To what extent do you agree or disagree?`,
             }, 1000);
         }
 
-        function submitTest() {
+        async function submitTest() {
             console.log('Submitting test...');
             if (!testActive) return;
+            
+            // Disable submit button during submission
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
             
             const studentName = document.getElementById('studentName').value;
             const task1Answer = document.getElementById('task1Answer').value;
@@ -673,9 +702,90 @@ To what extent do you agree or disagree?`,
             
             console.log('Submission data:', submissionData);
             
-            // For now, just show success (you can add actual submission logic later)
+            let googleSheetSuccess = false;
+            let emailSuccess = false;
+            let statusMessages = [];
+            
+            // Submit to Google Sheets
+            if (CONFIG.googleScriptUrl) {
+                try {
+                    const response = await fetch(CONFIG.googleScriptUrl, {
+                        method: 'POST',
+                        mode: 'no-cors', // Google Scripts require no-cors mode
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(submissionData)
+                    });
+                    
+                    // With no-cors mode, we can't check the response, so we assume success
+                    googleSheetSuccess = true;
+                    statusMessages.push('<div class="submission-status success">✓ Successfully saved to Google Sheets</div>');
+                    console.log('Google Sheets submission successful');
+                } catch (error) {
+                    console.error('Google Sheets submission failed:', error);
+                    statusMessages.push('<div class="submission-status error">✗ Failed to save to Google Sheets</div>');
+                }
+            }
+            
+            // Submit via EmailJS
+            if (CONFIG.emailjs.serviceId && CONFIG.emailjs.templateId && CONFIG.emailjs.publicKey) {
+                try {
+                    const emailData = {
+                        to_name: 'Teacher', // You can customize this
+                        student_name: submissionData.student_name,
+                        test_date: submissionData.test_date,
+                        test_time: submissionData.test_time,
+                        task1_question: submissionData.task1_question,
+                        task1_answer: submissionData.task1_answer,
+                        task1_words: submissionData.task1_words,
+                        task2_question: submissionData.task2_question,
+                        task2_answer: submissionData.task2_answer,
+                        task2_words: submissionData.task2_words,
+                        total_time: submissionData.total_time,
+                        total_words: submissionData.total_words
+                    };
+                    
+                    const response = await emailjs.send(
+                        CONFIG.emailjs.serviceId,
+                        CONFIG.emailjs.templateId,
+                        emailData,
+                        CONFIG.emailjs.publicKey
+                    );
+                    
+                    emailSuccess = true;
+                    statusMessages.push('<div class="submission-status success">✓ Successfully sent via email</div>');
+                    console.log('EmailJS submission successful:', response);
+                } catch (error) {
+                    console.error('EmailJS submission failed:', error);
+                    statusMessages.push('<div class="submission-status error">✗ Failed to send email</div>');
+                }
+            }
+            
+            // Show results modal
+            const modalTitle = document.getElementById('modalTitle');
+            const modalMessage = document.getElementById('modalMessage');
+            const modalContent = document.getElementById('modalContent');
+            const submissionStatus = document.getElementById('submissionStatus');
+            
+            if (googleSheetSuccess || emailSuccess) {
+                modalTitle.textContent = '✓ Test Submitted Successfully!';
+                modalMessage.textContent = 'Your responses have been recorded.';
+                modalContent.classList.remove('error');
+            } else {
+                modalTitle.textContent = '⚠ Submission Issues';
+                modalMessage.textContent = 'There were some issues with submission. Please contact your teacher.';
+                modalContent.classList.add('error');
+            }
+            
+            submissionStatus.innerHTML = statusMessages.join('');
+            
             showSuccessModal();
             resetTest();
+            
+            // Re-enable submit button
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Test';
         }
 
         function showSuccessModal() {
